@@ -1,0 +1,291 @@
+body{
+    margin:0;
+    background:#eef2f7;
+    font-family:"Yu Gothic UI","Meiryo",sans-serif;
+    color:#333;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:30px 20px 60px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+    color:#1f3b5b;
+}
+
+h2{
+    margin-top:40px;
+    margin-bottom:15px;
+    padding-bottom:8px;
+    border-bottom:3px solid #3b82f6;
+    color:#1f3b5b;
+}
+
+h3{
+    margin-top:25px;
+    margin-bottom:10px;
+    color:#555;
+}
+
+hr{
+    margin:50px 0;
+    border:none;
+    border-top:2px solid #d8d8d8;
+}
+
+/* ==========================
+   ボタン
+========================== */
+
+.drawButton{
+    display:block;
+    margin:0 auto 35px;
+    padding:15px 45px;
+    font-size:22px;
+    font-weight:bold;
+    color:white;
+    background:#2563eb;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.drawButton:hover{
+    background:#1d4ed8;
+    transform:scale(1.03);
+}
+
+.smallButton{
+
+    padding:8px 18px;
+    margin-right:10px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#64748b;
+    color:white;
+
+    cursor:pointer;
+    transition:.2s;
+
+}
+
+.smallButton:hover{
+
+    background:#475569;
+
+}
+
+.controlButtons{
+
+    margin-bottom:15px;
+
+}
+
+/* ==========================
+   抽選結果
+========================== */
+
+.resultGrid{
+
+    display:grid;
+    gap:16px;
+
+}
+
+.card{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    box-shadow:0 3px 8px rgba(0,0,0,.15);
+
+    border-left:10px solid #999;
+
+    transition:.2s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* ==========================
+   色分け
+========================== */
+
+.mainCharacter{
+
+    border-left-color:#dc2626;
+    background:#fef2f2;
+
+}
+
+.supportCharacter{
+
+    border-left-color:#2563eb;
+    background:#eff6ff;
+
+}
+
+.mainEquipment{
+
+    border-left-color:#ea580c;
+    background:#fff7ed;
+
+}
+
+.subEquipment{
+
+    border-left-color:#16a34a;
+    background:#f0fdf4;
+
+}
+
+/* ==========================
+   カード内
+========================== */
+
+.role{
+
+    font-size:14px;
+
+    color:#666;
+
+    font-weight:bold;
+
+    margin-bottom:8px;
+
+}
+
+.name{
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    line-height:1.4;
+
+}
+
+/* ==========================
+   チェック一覧
+========================== */
+
+.checkGrid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+
+    gap:10px;
+
+}
+
+.checkItem{
+    display:flex;
+    align-items:center;
+
+    padding:10px 12px;
+
+    border-radius:8px;
+
+    border-left:8px solid #999;
+    border:1px solid #ddd;
+
+    background:#fff;
+}
+
+.checkItem:hover{
+
+    background:#f8fafc;
+
+}
+
+.checkItem input{
+
+    margin-right:10px;
+
+    transform:scale(1.15);
+
+}
+
+.attribute-火{
+    background:#ffe5e5;
+    border-left-color:#d32f2f;
+}
+
+.attribute-水{
+    background:#e3f2fd;
+    border-left-color:#1976d2;
+}
+
+.attribute-光{
+    background:#fff9c4;
+    border-left-color:#e5c676;
+}
+
+.attribute-闇{
+    background:#f3e5f5;
+    border-left-color:#632692;
+}
+
+.attribute-地{
+    background:#efebe9;
+    border-left-color:#957062;
+}
+
+.attribute-風{
+    background:#f1f8e9;
+    border-left-color:#92c763;
+}
+
+/* ==========================
+   スマホ対応
+========================== */
+
+@media (max-width:768px){
+
+    .container{
+
+        padding:20px 15px 40px;
+
+    }
+
+    .drawButton{
+
+        width:100%;
+
+        font-size:20px;
+
+    }
+
+    .checkGrid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .name{
+
+        font-size:22px;
+
+    }
+    .stageCard{
+
+        border-left-color:#7c3aed;
+        background:#f5f3ff;
+
+    }
+}

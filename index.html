@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闇鍋指名手配</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>闇鍋指名手配用ランダム抽選</h1>
+
+        <h3>注意点など</h3>
+        <ul>
+        <li>素質選択... レベル報酬、メザメール、強化などのいずれの場合も真ん中を選択する。選択肢が2つある場合は左側を選択する。なお、リロールは禁止する。</li>
+        <li>塔の会話... 自由に選択をしても良いこととする。ただし、素質選択を挟む場合は真ん中を選択する。</li>
+        <li>コンビニ... メザメール、音符、ラインナップの在庫補充のいずれも自由に選択し購入することができる。ただし、メザメールの素質選択は上記のルールを則るものとする。</li>
+        <li>その他... キャラ及びロスレコ、徽章等の育成は自由とする。また、キャラ及びロスレコ、塔選択は一度のみだが、塔を登る回数と指名手配に参加する回数は自由とする。</li>
+        </ul>
+
+
+        <button id="drawButton" class="drawButton">
+            ランダム抽選
+        </button>
+
+        <!-- 抽選結果 -->
+        <section class="resultSection">
+
+            <h2>抽選結果</h2>
+
+            <h3>キャラクター</h3>
+            <div id="characterResult" class="resultGrid"></div>
+
+            <h3>ロスレコ</h3>
+            <div id="equipmentResult" class="resultGrid"></div>
+
+        </section>
+
+        <hr>
+
+        <!-- キャラクター選択 -->
+        <section class="selectSection">
+
+            <h2>抽選対象キャラクター</h2>
+
+            <div class="controlButtons">
+                <button id="checkAllCharacters" class="smallButton">
+                    全選択
+                </button>
+
+                <button id="uncheckAllCharacters" class="smallButton">
+                    全解除
+                </button>
+            </div>
+
+            <div id="characterList" class="checkGrid"></div>
+
+        </section>
+
+        <!-- ロスレコ選択 -->
+        <section class="selectSection">
+
+            <h2>抽選対象ロスレコ</h2>
+
+            <div class="controlButtons">
+                <button id="checkAllEquipments" class="smallButton">
+                    全選択
+                </button>
+
+                <button id="uncheckAllEquipments" class="smallButton">
+                    全解除
+                </button>
+            </div>
+
+            <div id="equipmentList" class="checkGrid"></div>
+
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
