@@ -1,4 +1,5 @@
 [
+    { "name": "水着ウィロー", "attribute": "水" },
     { "name": "シャトン", "attribute": "火" },
     { "name": "スパクル", "attribute": "地" },
     { "name": "ホタル", "attribute": "光" },
@@ -34,6 +35,5 @@
     { "name": "フローラ", "attribute": "火" },
     { "name": "コゼット", "attribute": "闇" },
     { "name": "キャラメル", "attribute": "闇" },
-    { "name": "ラール", "attribute": "光" },
-    { "name": "水着ウィロー", "attribute": "水" }
+    { "name": "ラール", "attribute": "光" }
 ]
