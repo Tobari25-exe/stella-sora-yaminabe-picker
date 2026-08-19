@@ -1,4 +1,6 @@
 [
+  { "title": "サマーマーチ", "source": "カリンイベ配布", "attribute": "闇" },
+  { "title": "共に航る", "source": "カリン餅", "attribute": "闇" },
   { "title": "友との夏休み", "source": "水着ウィローイベ配布", "attribute": "水" },
   { "title": "揺らめく光の向こう側", "source": "水着ウィロー餅", "attribute": "水" },
   { "title": "団らんのひととき", "source": "シャトンイベ配布", "attribute": "火" },
