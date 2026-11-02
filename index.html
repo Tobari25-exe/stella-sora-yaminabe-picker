@@ -29,6 +29,9 @@
         <ul>
         <li>『抽選』ボタンを押すと、巡遊者とロスレコがランダムに選出されます。</li>
         <li>未所持の巡遊者・ロスレコは、下のチェックボックスをオフにすることで対象外になります。</li>
+        <li>検索欄は巡遊者とロスレコに共通です。名称・入手元の部分一致検索と、7属性の絞り込みを併用できます。</li>
+        <li>絞り込み中の「表示項目を全選択／全解除」は、画面に表示された項目のみを変更します。抽選は絞り込みで隠れた項目も含む、チェック済みの全項目から行われます。</li>
+        <li>チェックの選択状態はこのブラウザに自動保存されます。JSONに新しく追加された項目は選択済みになります。</li>
         </ul>
 
         <button id="drawButton" class="drawButton">
@@ -50,6 +53,33 @@
 
         <hr>
 
+        <div class="selectionPreferences">
+            <span>抽選対象の設定は、このブラウザに保存されます。</span>
+        </div>
+        <p id="storageWarning" class="storageWarning" role="alert" hidden>ブラウザの保存領域を利用できないため、選択状態は再読み込み後に維持されません。</p>
+
+        <!-- 巡遊者とロスレコに共通の検索・属性絞り込み -->
+        <section class="filterSection" aria-labelledby="filterTitle">
+            <h2 id="filterTitle">抽選対象を探す</h2>
+            <label for="itemSearch" class="filterLabel">巡遊者・ロスレコ共通検索（名前・タイトル・入手元）</label>
+            <input id="itemSearch" class="searchInput" type="search" placeholder="名前・タイトル・入手元で検索" autocomplete="off">
+
+            <div class="attributeFilterHeader">
+                <span class="filterLabel" id="attributeFilterLabel">属性で絞り込む（複数選択可）</span>
+                <button id="clearFilters" type="button" class="clearFilterButton" disabled>検索・絞り込みをクリア</button>
+            </div>
+            <div class="attributeFilterButtons" role="group" aria-labelledby="attributeFilterLabel">
+                <button type="button" class="attributeFilterButton" data-attribute="火" aria-pressed="false">火</button>
+                <button type="button" class="attributeFilterButton" data-attribute="水" aria-pressed="false">水</button>
+                <button type="button" class="attributeFilterButton" data-attribute="風" aria-pressed="false">風</button>
+                <button type="button" class="attributeFilterButton" data-attribute="地" aria-pressed="false">地</button>
+                <button type="button" class="attributeFilterButton" data-attribute="光" aria-pressed="false">光</button>
+                <button type="button" class="attributeFilterButton" data-attribute="闇" aria-pressed="false">闇</button>
+                <button type="button" class="attributeFilterButton" data-attribute="無属性" aria-pressed="false">無属性</button>
+            </div>
+            <p class="filterHint">検索と属性は組み合わせて適用します。チェック状態は検索を解除しても維持されます。</p>
+        </section>
+
         <!-- 巡遊者選択 -->
         <section class="selectSection">
 
@@ -65,7 +95,9 @@
                 </button>
             </div>
 
+            <p id="characterCount" class="listStatus" aria-live="polite"></p>
             <div id="characterList" class="checkGrid"></div>
+            <p id="characterEmpty" class="emptyMessage" hidden>条件に一致する巡遊者はいません。</p>
 
         </section>
 
@@ -84,7 +116,9 @@
                 </button>
             </div>
 
+            <p id="equipmentCount" class="listStatus" aria-live="polite"></p>
             <div id="equipmentList" class="checkGrid"></div>
+            <p id="equipmentEmpty" class="emptyMessage" hidden>条件に一致するロスレコはありません。</p>
 
         </section>
 

@@ -289,3 +289,149 @@ hr{
 
     }
 }
+/* 選択状態の保存 */
+.selectionPreferences {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 18px 0;
+    color: #475569;
+}
+.storageWarning:not([hidden]) {
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #92400e;
+    background: #fef3c7;
+}
+
+/* 属性が空欄の場合も無属性として表示 */
+.attribute-無,
+.attribute-無属性 {
+    background: #f1f5f9;
+    border-left-color: #64748b;
+}
+
+/* ==========================
+   共通検索・属性絞り込み
+========================== */
+.filterSection {
+    padding: 18px 22px 20px;
+    border: 1px solid #d5deea;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(23, 45, 76, .05);
+    margin: 26px 0 34px;
+}
+.filterSection h2 {
+    margin-top: 0;
+}
+.filterLabel {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    color: #334155;
+    margin-bottom: 8px;
+}
+.searchInput {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 640px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #94a3b8;
+    font: inherit;
+    background: #fff;
+    color: #1e293b;
+}
+.searchInput:focus-visible,
+.attributeFilterButton:focus-visible,
+.clearFilterButton:focus-visible,
+.smallButton:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+.attributeFilterHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-top: 18px;
+}
+.attributeFilterButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+.attributeFilterButton {
+    --attribute-color: #64748b;
+    --attribute-bg: #f1f5f9;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 2px solid var(--attribute-color);
+    background: var(--attribute-bg);
+    color: #1f2937;
+    cursor: pointer;
+    font: inherit;
+    font-weight: bold;
+    min-width: 58px;
+    transition: background .15s, color .15s, box-shadow .15s;
+}
+.attributeFilterButton:hover {
+    box-shadow: 0 1px 6px rgba(15,23,42,.18);
+}
+.attributeFilterButton.isActive {
+    color: #fff;
+    background: var(--attribute-color);
+    box-shadow: 0 0 0 2px #fff inset;
+}
+.attributeFilterButton[data-attribute="火"] { --attribute-color: #b91c1c; --attribute-bg: #fee2e2; }
+.attributeFilterButton[data-attribute="水"] { --attribute-color: #1d4ed8; --attribute-bg: #dbeafe; }
+.attributeFilterButton[data-attribute="風"] { --attribute-color: #4d7c0f; --attribute-bg: #ecfccb; }
+.attributeFilterButton[data-attribute="地"] { --attribute-color: #795548; --attribute-bg: #efebe9; }
+.attributeFilterButton[data-attribute="光"] { --attribute-color: #a16207; --attribute-bg: #fef9c3; }
+.attributeFilterButton[data-attribute="闇"] { --attribute-color: #6b21a8; --attribute-bg: #f3e8ff; }
+.attributeFilterButton[data-attribute="無属性"] { --attribute-color: #475569; --attribute-bg: #f1f5f9; }
+.clearFilterButton {
+    padding: 3px 1px;
+    color: #1d4ed8;
+    background: transparent;
+    border: 0;
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+}
+.clearFilterButton:disabled {
+    color: #94a3b8;
+    cursor: default;
+    text-decoration: none;
+}
+.filterHint, .listStatus {
+    margin: 12px 0;
+    color: #475569;
+    font-size: 13px;
+}
+.emptyMessage:not([hidden]) {
+    padding: 14px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    color: #64748b;
+}
+/* .checkItem の display:flex より強く非表示を保証する */
+.checkItem[hidden] {
+    display: none;
+}
+.smallButton:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+@media (max-width: 768px) {
+    .filterSection { padding: 14px; }
+    .attributeFilterButtons { gap: 8px; }
+    .attributeFilterButton { padding: 8px 12px; }
+    .controlButtons { display: flex; flex-wrap: wrap; gap: 8px; }
+    .controlButtons .smallButton { margin-right: 0; }
+}

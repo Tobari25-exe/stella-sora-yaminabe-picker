@@ -1,141 +1,236 @@
 let characters = [];
 let equipments = [];
-const stages = [
-    "光地塔",
-    "水風塔",
-    "火闇塔"
-];
+const stages = ["光地塔", "水風塔", "火闇塔"];
+const selectedAttributes = new Set();
+const renderedItems = { characters: [], equipments: [] };
+
+function normalizeAttribute(attribute) {
+    return !attribute || attribute === "無" || attribute === "無属性" ? "無属性" : attribute;
+}
+
+function normalizeSearchText(value) {
+    return String(value ?? "").normalize("NFKC").toLocaleLowerCase("ja");
+}
+
+function isFiltering() {
+    return document.getElementById("itemSearch").value.trim() !== "" || selectedAttributes.size > 0;
+}
+
+
+// 保存するのは「未選択のID」のみ。
+// JSONに新しく追加されたIDは未選択リストに無いため、自動で選択済みになる。
+const STORAGE_KEY = "yaminabe-unselected-v1";
+const excludedIds = {
+    characters: new Set(),
+    equipments: new Set()
+};
+
+function showStorageWarning() {
+    document.getElementById("storageWarning").hidden = false;
+}
+
+function loadSelection() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+
+        const saved = JSON.parse(raw);
+        if (!saved || typeof saved !== "object" || Array.isArray(saved)) return;
+
+        for (const type of ["characters", "equipments"]) {
+            if (Array.isArray(saved[type])) {
+                excludedIds[type] = new Set(
+                    saved[type].filter(id => typeof id === "string")
+                );
+            }
+        }
+    } catch (error) {
+        // 保存領域を使用できない場合も、抽選自体は引き続き利用できる。
+        console.warn("選択状態を読み込めませんでした。", error);
+        showStorageWarning();
+    }
+}
+
+function saveSelection() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            characters: [...excludedIds.characters],
+            equipments: [...excludedIds.equipments]
+        }));
+    } catch (error) {
+        console.warn("選択状態を保存できませんでした。", error);
+        showStorageWarning();
+    }
+}
 
 async function loadData() {
-
     characters = await (await fetch("characters.json")).json();
     equipments = await (await fetch("equipments.json")).json();
-
 }
 
 function shuffle(array) {
-
     const copied = [...array];
-
     for (let i = copied.length - 1; i > 0; i--) {
-
         const j = Math.floor(Math.random() * (i + 1));
-
         [copied[i], copied[j]] = [copied[j], copied[i]];
-
     }
-
     return copied;
-
 }
 
 function equipmentName(equipment) {
+    return equipment.source
+        ? `${equipment.title} (${equipment.source})`
+        : equipment.title;
+}
 
-    if (equipment.source) {
-        return `${equipment.title} (${equipment.source})`;
-    }
-
-    return equipment.title;
-
+// 新しいJSON項目には固有IDを付ける。万一IDが無い場合は名称を暫定キーとする。
+// 名称変更後も選択状態を維持したい場合は、必ず固定IDを使用すること。
+function itemId(item, type) {
+    return String(item.id ?? (type === "characters"
+        ? `name:${item.name}`
+        : `title:${item.title}`));
 }
 
 function createCheckLists() {
-
     const characterList = document.getElementById("characterList");
     const equipmentList = document.getElementById("equipmentList");
+    characterList.replaceChildren();
+    equipmentList.replaceChildren();
+    renderedItems.characters = [];
+    renderedItems.equipments = [];
 
-    characterList.innerHTML = "";
-    equipmentList.innerHTML = "";
-
-    characters.forEach((character, index) => {
-
+    function appendItem(parent, item, type) {
         const label = document.createElement("label");
-
         label.className = "checkItem";
+        label.classList.add(`attribute-${normalizeAttribute(item.attribute)}`);
 
-        if (character.attribute) {
-            label.classList.add(`attribute-${character.attribute}`);
-        }
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = type === "characters" ? "characterCheck" : "equipmentCheck";
+        checkbox.value = itemId(item, type);
+        checkbox.checked = !excludedIds[type].has(checkbox.value);
 
-        label.innerHTML = `
-            <input
-                type="checkbox"
-                class="characterCheck"
-                value="${index}"
-                checked>
-            ${character.name}
-        `;
+        // JSONの名称をHTMLとして解釈せず、テキストとして表示する。
+        label.append(checkbox, document.createTextNode(type === "characters"
+            ? item.name
+            : equipmentName(item)));
+        parent.appendChild(label);
+        renderedItems[type].push({ label, checkbox, item });
+    }
 
-        characterList.appendChild(label);
-
-    });
-
-    equipments.forEach((equipment, index) => {
-
-        const label = document.createElement("label");
-
-        label.className = "checkItem";
-
-        if (equipment.attribute) {
-            label.classList.add(`attribute-${equipment.attribute}`);
-        }
-        label.innerHTML = `
-            <input
-                type="checkbox"
-                class="equipmentCheck"
-                value="${index}"
-                checked>
-            ${equipmentName(equipment)}
-        `;
-
-        equipmentList.appendChild(label);
-
-    });
-
+    characters.forEach(item => appendItem(characterList, item, "characters"));
+    equipments.forEach(item => appendItem(equipmentList, item, "equipments"));
 }
 
-function setAllChecks(className, checked) {
+// 検索と属性ボタンは両リストに共通。複数属性はOR、検索との組み合わせはAND。
+function applyFilters() {
+    const term = normalizeSearchText(document.getElementById("itemSearch").value.trim());
+    const filtering = isFiltering();
 
-    document.querySelectorAll(className).forEach(check => {
+    for (const type of ["characters", "equipments"]) {
+        let visibleCount = 0;
+        let visibleCheckedCount = 0;
+        let totalCheckedCount = 0;
 
-        check.checked = checked;
+        for (const { label, checkbox, item } of renderedItems[type]) {
+            const fields = [item.name, item.title, item.source];
+            const matchesTerm = !term || fields.some(field => normalizeSearchText(field).includes(term));
+            const matchesAttribute = selectedAttributes.size === 0 || selectedAttributes.has(normalizeAttribute(item.attribute));
+            const visible = matchesTerm && matchesAttribute;
+            label.hidden = !visible;
+            if (visible) {
+                visibleCount++;
+                if (checkbox.checked) visibleCheckedCount++;
+            }
+            if (checkbox.checked) totalCheckedCount++;
+        }
 
+        const total = renderedItems[type].length;
+        const prefix = type === "characters" ? "character" : "equipment";
+        document.getElementById(`${prefix}Count`).textContent = filtering
+            ? `表示 ${visibleCount} / ${total}件（表示中の選択 ${visibleCheckedCount}件）`
+            : `全 ${total}件（選択 ${totalCheckedCount}件）`;
+        document.getElementById(`${prefix}Empty`).hidden = visibleCount !== 0;
+
+        const plural = type === "characters" ? "Characters" : "Equipments";
+        const selectButton = document.getElementById(`checkAll${plural}`);
+        const clearButton = document.getElementById(`uncheckAll${plural}`);
+        selectButton.textContent = filtering ? "表示項目を全選択" : "全選択";
+        clearButton.textContent = filtering ? "表示項目を全解除" : "全解除";
+        selectButton.disabled = visibleCount === 0;
+        clearButton.disabled = visibleCount === 0;
+    }
+
+    document.getElementById("clearFilters").disabled = !filtering;
+}
+
+function toggleAttribute(button) {
+    const attribute = button.dataset.attribute;
+    if (selectedAttributes.has(attribute)) selectedAttributes.delete(attribute);
+    else selectedAttributes.add(attribute);
+    const pressed = selectedAttributes.has(attribute);
+    button.classList.toggle("isActive", pressed);
+    button.setAttribute("aria-pressed", String(pressed));
+    applyFilters();
+}
+
+function clearFilters() {
+    document.getElementById("itemSearch").value = "";
+    selectedAttributes.clear();
+    document.querySelectorAll(".attributeFilterButton").forEach(button => {
+        button.classList.remove("isActive");
+        button.setAttribute("aria-pressed", "false");
     });
+    applyFilters();
+}
 
+function updateSelection(type, selector) {
+    // JSONから一時的に削除された項目の未選択状態も保持する。
+    const next = new Set(excludedIds[type]);
+    document.querySelectorAll(selector).forEach(check => {
+        if (check.checked) next.delete(check.value);
+        else next.add(check.value);
+    });
+    excludedIds[type] = next;
+    saveSelection();
+    applyFilters();
+}
+
+function setAllChecks(type, selector, checked) {
+    const filtering = isFiltering();
+    // 条件がある間は「表示中」の項目のみ操作。非表示の選択状態は変更しない。
+    // 条件がない全選択は、過去にJSONから削除されたIDも含めて未選択設定をクリアする。
+    if (!filtering && checked) excludedIds[type].clear();
+    document.querySelectorAll(selector).forEach(check => {
+        if (!filtering || !check.closest(".checkItem").hidden) {
+            check.checked = checked;
+        }
+    });
+    updateSelection(type, selector);
 }
 
 function draw() {
-
-    const enabledCharacters = characters.filter((character, index) =>
-        document.querySelectorAll(".characterCheck")[index].checked
+    const checkedCharacters = new Set(
+        [...document.querySelectorAll(".characterCheck:checked")].map(check => check.value)
     );
-
-    const enabledEquipments = equipments.filter((equipment, index) =>
-        document.querySelectorAll(".equipmentCheck")[index].checked
+    const checkedEquipments = new Set(
+        [...document.querySelectorAll(".equipmentCheck:checked")].map(check => check.value)
     );
+    const enabledCharacters = characters.filter(item => checkedCharacters.has(itemId(item, "characters")));
+    const enabledEquipments = equipments.filter(item => checkedEquipments.has(itemId(item, "equipments")));
 
     if (enabledCharacters.length < 3) {
-
         alert("キャラクターを3人以上選択してください。");
         return;
-
     }
-
     if (enabledEquipments.length < 6) {
-
         alert("ロスレコを6個以上選択してください。");
         return;
-
     }
 
-    const selectedCharacters =
-        shuffle(enabledCharacters).slice(0, 3);
-
-    const selectedEquipments =
-        shuffle(enabledEquipments).slice(0, 6);
-
-    const selectedStage =
-    stages[Math.floor(Math.random() * stages.length)];
+    const selectedCharacters = shuffle(enabledCharacters).slice(0, 3);
+    const selectedEquipments = shuffle(enabledEquipments).slice(0, 6);
+    const selectedStage = stages[Math.floor(Math.random() * stages.length)];
 
     document.getElementById("characterResult").innerHTML = `
         <div class="card stageCard">
@@ -174,7 +269,8 @@ function draw() {
             <div class="role">メイン③</div>
             <div class="name">${equipmentName(selectedEquipments[2])}</div>
         </div>
-                <div class="card subEquipment">
+
+        <div class="card subEquipment">
             <div class="role">サブ①</div>
             <div class="name">${equipmentName(selectedEquipments[3])}</div>
         </div>
@@ -189,49 +285,48 @@ function draw() {
             <div class="name">${equipmentName(selectedEquipments[5])}</div>
         </div>
     `;
-
 }
 
-window.onload = async () => {
+window.addEventListener("load", async () => {
+    try {
+        await loadData();
+        loadSelection();
+        createCheckLists();
+        applyFilters();
+    } catch (error) {
+        console.error("データの読み込みに失敗しました。", error);
+        alert("データを読み込めませんでした。ページを再読み込みしてください。");
+        return;
+    }
 
-    await loadData();
+    document.getElementById("drawButton").addEventListener("click", draw);
+    document.getElementById("itemSearch").addEventListener("input", applyFilters);
+    document.querySelectorAll(".attributeFilterButton").forEach(button => {
+        button.addEventListener("click", () => toggleAttribute(button));
+    });
+    document.getElementById("clearFilters").addEventListener("click", clearFilters);
 
-    createCheckLists();
+    document.getElementById("characterList").addEventListener("change", event => {
+        if (event.target.matches(".characterCheck")) {
+            updateSelection("characters", ".characterCheck");
+        }
+    });
+    document.getElementById("equipmentList").addEventListener("change", event => {
+        if (event.target.matches(".equipmentCheck")) {
+            updateSelection("equipments", ".equipmentCheck");
+        }
+    });
 
-    document
-        .getElementById("drawButton")
-        .addEventListener("click", draw);
-
-    document
-        .getElementById("checkAllCharacters")
-        .addEventListener("click", () => {
-
-            setAllChecks(".characterCheck", true);
-
-        });
-
-    document
-        .getElementById("uncheckAllCharacters")
-        .addEventListener("click", () => {
-
-            setAllChecks(".characterCheck", false);
-
-        });
-
-    document
-        .getElementById("checkAllEquipments")
-        .addEventListener("click", () => {
-
-            setAllChecks(".equipmentCheck", true);
-
-        });
-
-    document
-        .getElementById("uncheckAllEquipments")
-        .addEventListener("click", () => {
-
-            setAllChecks(".equipmentCheck", false);
-
-        });
-
-};
+    document.getElementById("checkAllCharacters").addEventListener("click", () => {
+        setAllChecks("characters", ".characterCheck", true);
+    });
+    document.getElementById("uncheckAllCharacters").addEventListener("click", () => {
+        setAllChecks("characters", ".characterCheck", false);
+    });
+    document.getElementById("checkAllEquipments").addEventListener("click", () => {
+        setAllChecks("equipments", ".equipmentCheck", true);
+    });
+    document.getElementById("uncheckAllEquipments").addEventListener("click", () => {
+        setAllChecks("equipments", ".equipmentCheck", false);
+    });
+});
