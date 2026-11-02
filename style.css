@@ -38,6 +38,61 @@ hr{
 }
 
 /* ==========================
+   説明セクションの折り畳み
+========================== */
+.infoPanel {
+    margin: 0 0 14px;
+    border: 1px solid #d5deea;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+.infoPanel summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 18px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #1f3b5b;
+    cursor: pointer;
+    user-select: none;
+}
+.infoPanel summary::-webkit-details-marker {
+    display: none;
+}
+.infoPanel summary::after {
+    content: "⌄";
+    flex: none;
+    font-size: 24px;
+    line-height: 1;
+    color: #2563eb;
+    transform: rotate(0deg);
+    transition: transform .15s ease;
+}
+.infoPanel[open] summary::after {
+    transform: rotate(180deg);
+}
+.infoPanel summary:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: -3px;
+}
+.infoPanelContent {
+    border-top: 1px solid #e2e8f0;
+    padding: 4px 18px 12px;
+    line-height: 1.7;
+}
+.infoPanelContent ul {
+    margin: 8px 0;
+    padding-left: 22px;
+}
+.infoPanelContent li + li {
+    margin-top: 6px;
+}
+
+/* ==========================
    ボタン
 ========================== */
 
@@ -89,36 +144,63 @@ hr{
 }
 
 /* ==========================
-   抽選結果
+   抽選結果（PC・スマホともに横3列）
 ========================== */
-
-.resultGrid{
-
-    display:grid;
-    gap:16px;
-
+.resultSection h2 {
+    margin-top: 24px;
+    margin-bottom: 14px;
 }
-
-.card{
-
-    background:white;
-
-    border-radius:12px;
-
-    padding:18px;
-
-    box-shadow:0 3px 8px rgba(0,0,0,.15);
-
-    border-left:10px solid #999;
-
-    transition:.2s;
-
+.resultSection h3 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 17px;
 }
-
-.card:hover{
-
-    transform:translateY(-2px);
-
+.resultGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+.stageResult:not([hidden]) {
+    display: block;
+}
+.stageResult .stageCard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    padding: 12px 18px;
+}
+.stageResult .role {
+    margin-bottom: 0;
+}
+.stageResult .name {
+    font-size: 22px;
+}
+.card {
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 14px;
+    background: white;
+    border-radius: 10px;
+    border-left: 7px solid #999;
+    box-shadow: 0 2px 6px rgba(0,0,0,.11);
+    overflow-wrap: anywhere;
+}
+.card .role {
+    color: #666;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.card .name {
+    font-size: clamp(15px, 1.9vw, 22px);
+    font-weight: bold;
+    line-height: 1.35;
+}
+.stageCard {
+    border-left-color: #7c3aed;
+    background: #f5f3ff;
 }
 
 /* ==========================
@@ -150,32 +232,6 @@ hr{
 
     border-left-color:#16a34a;
     background:#f0fdf4;
-
-}
-
-/* ==========================
-   カード内
-========================== */
-
-.role{
-
-    font-size:14px;
-
-    color:#666;
-
-    font-weight:bold;
-
-    margin-bottom:8px;
-
-}
-
-.name{
-
-    font-size:28px;
-
-    font-weight:bold;
-
-    line-height:1.4;
 
 }
 
@@ -254,50 +310,45 @@ hr{
 /* ==========================
    スマホ対応
 ========================== */
-
-@media (max-width:768px){
-
-    .container{
-
-        padding:20px 15px 40px;
-
+@media (max-width:768px) {
+    .container {
+        padding: 18px 12px 40px;
     }
+    h1 { font-size: 24px; margin-bottom: 22px; }
+    .infoPanel summary { padding: 13px 14px; font-size: 17px; }
+    .infoPanelContent { padding: 3px 12px 10px; font-size: 14px; }
+    .drawButton { width: 100%; font-size: 20px; margin-bottom: 18px; }
+    .checkGrid { grid-template-columns: 1fr; }
 
-    .drawButton{
-
-        width:100%;
-
-        font-size:20px;
-
+    /* 画面幅の狭い端末でも巡遊者3枚・ロスレコ3枚×2段を維持 */
+    .resultSection h2 { margin-top: 18px; margin-bottom: 9px; font-size: 20px; }
+    .resultSection h3 { margin-top: 12px; margin-bottom: 6px; font-size: 15px; }
+    .resultGrid { gap: 6px; }
+    .resultSection .card {
+        padding: 9px 6px 9px 8px;
+        border-radius: 8px;
+        border-left-width: 4px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.1);
     }
-
-    .checkGrid{
-
-        grid-template-columns:1fr;
-
+    .resultSection .card .role {
+        font-size: 11px;
+        line-height: 1.2;
+        margin-bottom: 4px;
     }
-
-    .name{
-
-        font-size:22px;
-
+    .resultSection .card .name {
+        font-size: clamp(11px, 3.25vw, 15px);
+        line-height: 1.3;
     }
-    .stageCard{
-
-        border-left-color:#7c3aed;
-        background:#f5f3ff;
-
+    .resultSection .stageResult .stageCard {
+        padding: 8px 12px;
+        min-height: 42px;
+        gap: 8px 12px;
     }
+    .resultSection .stageResult .stageCard .role { margin-bottom: 0; }
+    .resultSection .stageResult .stageCard .name { font-size: 17px; }
 }
-/* 選択状態の保存 */
-.selectionPreferences {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin: 18px 0;
-    color: #475569;
-}
+
+/* 保存領域が使用できない場合のみ警告を表示 */
 .storageWarning:not([hidden]) {
     padding: 10px 12px;
     border-radius: 8px;
@@ -394,21 +445,36 @@ hr{
 .attributeFilterButton[data-attribute="闇"] { --attribute-color: #6b21a8; --attribute-bg: #f3e8ff; }
 .attributeFilterButton[data-attribute="無属性"] { --attribute-color: #475569; --attribute-bg: #f1f5f9; }
 .clearFilterButton {
-    padding: 3px 1px;
-    color: #1d4ed8;
-    background: transparent;
-    border: 0;
-    text-decoration: underline;
+    padding: 9px 16px;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
     cursor: pointer;
     font: inherit;
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: background .15s ease;
+}
+.clearFilterButton:not(:disabled):hover {
+    background: #1d4ed8;
 }
 .clearFilterButton:disabled {
     color: #94a3b8;
-    cursor: default;
-    text-decoration: none;
+    border-color: #cbd5e1;
+    background: #e2e8f0;
+    cursor: not-allowed;
 }
-.filterHint, .listStatus {
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+.listStatus {
     margin: 12px 0;
     color: #475569;
     font-size: 13px;

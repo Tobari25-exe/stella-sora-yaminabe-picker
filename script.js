@@ -19,6 +19,46 @@ function isFiltering() {
 
 // 保存するのは「未選択のID」のみ。
 // JSONに新しく追加されたIDは未選択リストに無いため、自動で選択済みになる。
+// 2つの説明パネルはそれぞれ独立して開閉状態を保持する。
+const INFO_STORAGE_KEY = "yaminabe-info-panels-v1";
+const INFO_PANEL_IDS = ["aboutDetails", "usageDetails"];
+
+function initializeInfoPanels() {
+    try {
+        const raw = localStorage.getItem(INFO_STORAGE_KEY);
+        if (raw) {
+            const saved = JSON.parse(raw);
+            if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+                for (const id of INFO_PANEL_IDS) {
+                    if (typeof saved[id] === "boolean") {
+                        document.getElementById(id).open = saved[id];
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.warn("説明パネルの開閉状態を読み込めませんでした。", error);
+        showStorageWarning();
+    }
+
+    for (const id of INFO_PANEL_IDS) {
+        document.getElementById(id).addEventListener("toggle", saveInfoPanels);
+    }
+}
+
+function saveInfoPanels() {
+    try {
+        const state = {};
+        for (const id of INFO_PANEL_IDS) {
+            state[id] = document.getElementById(id).open;
+        }
+        localStorage.setItem(INFO_STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+        console.warn("説明パネルの開閉状態を保存できませんでした。", error);
+        showStorageWarning();
+    }
+}
+
 const STORAGE_KEY = "yaminabe-unselected-v1";
 const excludedIds = {
     characters: new Set(),
@@ -232,12 +272,16 @@ function draw() {
     const selectedEquipments = shuffle(enabledEquipments).slice(0, 6);
     const selectedStage = stages[Math.floor(Math.random() * stages.length)];
 
-    document.getElementById("characterResult").innerHTML = `
+    const stageResult = document.getElementById("stageResult");
+    stageResult.innerHTML = `
         <div class="card stageCard">
             <div class="role">挑戦ステージ</div>
             <div class="name">${selectedStage}</div>
         </div>
+    `;
+    stageResult.hidden = false;
 
+    document.getElementById("characterResult").innerHTML = `
         <div class="card mainCharacter">
             <div class="role">主力</div>
             <div class="name">${selectedCharacters[0].name}</div>
@@ -288,6 +332,7 @@ function draw() {
 }
 
 window.addEventListener("load", async () => {
+    initializeInfoPanels();
     try {
         await loadData();
         loadSelection();
