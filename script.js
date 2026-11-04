@@ -8,6 +8,14 @@ function normalizeAttribute(attribute) {
     return !attribute || attribute === "無" || attribute === "無属性" ? "無属性" : attribute;
 }
 
+// 抽選結果のカードを、対象の属性に対応する配色にする。
+// 不明な属性は「無属性」にまとめ、クラス名として安全な値だけを使う。
+const resultAttributes = new Set(["火", "水", "風", "地", "光", "闇", "無属性"]);
+function resultAttributeClass(item) {
+    const attribute = normalizeAttribute(item.attribute);
+    return `attribute-${resultAttributes.has(attribute) ? attribute : "無属性"}`;
+}
+
 function normalizeSearchText(value) {
     return String(value ?? "").normalize("NFKC").toLocaleLowerCase("ja");
 }
@@ -274,7 +282,7 @@ function draw() {
 
     const stageResult = document.getElementById("stageResult");
     stageResult.innerHTML = `
-        <div class="card stageCard">
+        <div class="card stageCard stage-${selectedStage}">
             <div class="role">挑戦ステージ</div>
             <div class="name">${selectedStage}</div>
         </div>
@@ -282,49 +290,49 @@ function draw() {
     stageResult.hidden = false;
 
     document.getElementById("characterResult").innerHTML = `
-        <div class="card mainCharacter">
+        <div class="card mainCharacter ${resultAttributeClass(selectedCharacters[0])}">
             <div class="role">主力</div>
             <div class="name">${selectedCharacters[0].name}</div>
         </div>
 
-        <div class="card supportCharacter">
+        <div class="card supportCharacter ${resultAttributeClass(selectedCharacters[1])}">
             <div class="role">支援</div>
             <div class="name">${selectedCharacters[1].name}</div>
         </div>
 
-        <div class="card supportCharacter">
+        <div class="card supportCharacter ${resultAttributeClass(selectedCharacters[2])}">
             <div class="role">支援</div>
             <div class="name">${selectedCharacters[2].name}</div>
         </div>
     `;
 
     document.getElementById("equipmentResult").innerHTML = `
-        <div class="card mainEquipment">
+        <div class="card mainEquipment ${resultAttributeClass(selectedEquipments[0])}">
             <div class="role">メイン①</div>
             <div class="name">${equipmentName(selectedEquipments[0])}</div>
         </div>
 
-        <div class="card mainEquipment">
+        <div class="card mainEquipment ${resultAttributeClass(selectedEquipments[1])}">
             <div class="role">メイン②</div>
             <div class="name">${equipmentName(selectedEquipments[1])}</div>
         </div>
 
-        <div class="card mainEquipment">
+        <div class="card mainEquipment ${resultAttributeClass(selectedEquipments[2])}">
             <div class="role">メイン③</div>
             <div class="name">${equipmentName(selectedEquipments[2])}</div>
         </div>
 
-        <div class="card subEquipment">
+        <div class="card subEquipment ${resultAttributeClass(selectedEquipments[3])}">
             <div class="role">サブ①</div>
             <div class="name">${equipmentName(selectedEquipments[3])}</div>
         </div>
 
-        <div class="card subEquipment">
+        <div class="card subEquipment ${resultAttributeClass(selectedEquipments[4])}">
             <div class="role">サブ②</div>
             <div class="name">${equipmentName(selectedEquipments[4])}</div>
         </div>
 
-        <div class="card subEquipment">
+        <div class="card subEquipment ${resultAttributeClass(selectedEquipments[5])}">
             <div class="role">サブ③</div>
             <div class="name">${equipmentName(selectedEquipments[5])}</div>
         </div>

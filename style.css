@@ -203,6 +203,20 @@ hr{
     background: #f5f3ff;
 }
 
+/* 塔の2属性を、塔名の順番で左50%・右50%に色分けする。 */
+.stageCard.stage-光地塔 {
+    border-left-color: #efdc7b;
+    background: linear-gradient(to right, #fff9c4 50%, #efebe9 50%);
+}
+.stageCard.stage-水風塔 {
+    border-left-color: #3788d9;
+    background: linear-gradient(to right, #e3f2fd 50%, #f1f8e9 50%);
+}
+.stageCard.stage-火闇塔 {
+    border-left-color: #d53d3d;
+    background: linear-gradient(to right, #ffe5e5 50%, #f3e5f5 50%);
+}
+
 /* ==========================
    色分け
 ========================== */
